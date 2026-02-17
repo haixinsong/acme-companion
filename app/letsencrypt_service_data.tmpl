@@ -37,6 +37,8 @@ LETSENCRYPT_CONTAINERS=(
         {{ $EMAIL := trim (coalesce $container.Env.LETSENCRYPT_EMAIL "") }}
         {{ $CA_URI := trim (coalesce $container.Env.ACME_CA_URI "") }}
         {{ $ACME_CHALLENGE := trim (coalesce $container.Env.ACME_CHALLENGE "") }}
+        {{ $ACME_CERT_PROFILE := trim (coalesce $container.Env.ACME_CERT_PROFILE "") }}
+        {{ $ACME_TLSPORT := trim (coalesce $container.Env.ACME_TLSPORT "") }}
         {{ $ACMESH_DNS_API_CONFIG := fromYaml (coalesce $container.Env.ACMESH_DNS_API_CONFIG "") }}
         {{ $PREFERRED_CHAIN := trim (coalesce $container.Env.ACME_PREFERRED_CHAIN "") }}
         {{ $OCSP := trim (coalesce $container.Env.ACME_OCSP "") }}
@@ -59,6 +61,8 @@ LETSENCRYPT_CONTAINERS=(
                 {{- "\n" }}LETSENCRYPT_{{ $cid }}_{{ $hostHash }}_TEST="{{ $STAGING }}"
                 {{- "\n" }}LETSENCRYPT_{{ $cid }}_{{ $hostHash }}_EMAIL="{{ $EMAIL }}"
                 {{- "\n" }}ACME_{{ $cid }}_{{ $hostHash }}_CA_URI="{{ $CA_URI }}"
+                {{- "\n" }}ACME_{{ $cid }}_{{ $hostHash }}_CERT_PROFILE="{{ $ACME_CERT_PROFILE }}"
+                {{- "\n" }}ACME_{{ $cid }}_{{ $hostHash }}_TLSPORT="{{ $ACME_TLSPORT }}"
                 {{- "\n" }}ACME_{{ $cid }}_{{ $hostHash }}_CHALLENGE="{{ $ACME_CHALLENGE }}"
                 {{- if $ACMESH_DNS_API_CONFIG }}
                     {{- "\n" }}declare -A ACMESH_{{ $cid }}_{{ $hostHash }}_DNS_API_CONFIG=(
@@ -89,6 +93,8 @@ LETSENCRYPT_CONTAINERS=(
             {{- "\n" }}LETSENCRYPT_{{ $cid }}_TEST="{{ $STAGING }}"
             {{- "\n" }}LETSENCRYPT_{{ $cid }}_EMAIL="{{ $EMAIL }}"
             {{- "\n" }}ACME_{{ $cid }}_CA_URI="{{ $CA_URI }}"
+            {{- "\n" }}ACME_{{ $cid }}_CERT_PROFILE="{{ $ACME_CERT_PROFILE }}"
+            {{- "\n" }}ACME_{{ $cid }}_TLSPORT="{{ $ACME_TLSPORT }}"
             {{- "\n" }}ACME_{{ $cid }}_CHALLENGE="{{ $ACME_CHALLENGE }}"
             {{- if $ACMESH_DNS_API_CONFIG }}
                 {{- "\n" }}declare -A ACMESH_{{ $cid }}_DNS_API_CONFIG=(

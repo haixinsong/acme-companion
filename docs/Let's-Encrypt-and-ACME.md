@@ -62,6 +62,30 @@ volumes:
 
 If you experience issues with the DNS-01 ACME challenge, please try to get it working outside of the container before opening an issue. If you can't get it working outside of the container, please seek support on the [acme.sh repository](https://github.com/acmesh-official).
 
+#### IP-address certificates
+
+Some ACME CAs support issuing certificates for IP addresses. Support and requirements may vary by CA and can change over time, so if you run into validation errors, please double-check your CA's current policy.
+
+When your ACME CA supports it, you can request an IP-address certificate by using the `TLS-ALPN` challenge:
+
+- Set `LETSENCRYPT_HOST` to the public IP address.
+- Set `ACME_CHALLENGE` to `TLS-ALPN` (globally on the acme-companion container, or on the proxied application container to override the global value).
+
+By default, the TLS-ALPN validation uses TCP port 443. If you need acme.sh to listen on a different port inside the acme-companion container, you can set `ACME_TLSPORT` (or per container `ACME_TLSPORT`). Make sure the selected port is publicly reachable and mapped to the acme-companion container.
+
+For example, to use port `8443`, set `ACME_TLSPORT=8443` and publish `8443/tcp` to the acme-companion container. Make sure port `8443` is publicly reachable from the Internet and routed to the acme-companion container, even if acme-companion is behind an nginx proxy.
+
+Example:
+
+```shell
+$ docker run --detach \
+    --name your-proxyed-app \
+    --env "VIRTUAL_HOST=203.0.113.10" \
+    --env "LETSENCRYPT_HOST=203.0.113.10" \
+    --env "ACME_CHALLENGE=TLS-ALPN" \
+    nginx
+```
+
 #### Multi-domains certificates
 
 Specify multiple hosts with a comma delimiter to create multi-domains ([SAN](https://www.digicert.com/subject-alternative-name.htm)) certificates (the first domain in the list will be the base domain).

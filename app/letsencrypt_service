@@ -171,6 +171,17 @@ function update_cert {
     # CLI parameters array used for --issue
     local -a params_issue_arr
 
+    # ACME certificate profile
+    local -n acme_cert_profile="ACME_${cid}_CERT_PROFILE"
+    if [[ -z "${acme_cert_profile}" ]]; then
+        acme_cert_profile="${ACME_CERT_PROFILE:-}"
+    fi
+
+    if [[ -n "${acme_cert_profile}" ]]; then
+        params_issue_arr+=(--cert-profile "$acme_cert_profile")
+        [[ "$DEBUG" == 1 ]] && echo "Calling acme.sh with cert profile ${acme_cert_profile}, full parameters: ${params_base_arr[*]} ${params_issue_arr[*]}"
+    fi
+
     # ACME challenge type
     local -n acme_challenge="ACME_${cid}_CHALLENGE"
     if [[ -z "${acme_challenge}" ]]; then
@@ -225,6 +236,21 @@ function update_cert {
         esac
 
         echo "Info: DNS challenge using $acmesh_dns_api DNS API with the following keys: ${dns_api_keys[*]} (${acmesh_dns_config_used} config)"
+    elif [[ "$acme_challenge" == "TLS-ALPN" ]]; then
+        # TLS-ALPN challenge
+        params_issue_arr+=(--alpn)
+        [[ "$DEBUG" == 1 ]] && echo "Calling acme.sh with challenge type tls-alpn, full parameters: ${params_base_arr[*]} ${params_issue_arr[*]}"
+
+        # ACME TLS-ALPN challenge custom port
+        local -n acme_tlsport="ACME_${cid}_TLSPORT"
+        if [[ -z "${acme_tlsport}" ]]; then
+            acme_tlsport="${ACME_TLSPORT}"
+        fi
+
+        if [[ -n "${acme_tlsport}" ]]; then
+            params_issue_arr+=(--tlsport "$acme_tlsport")
+            [[ "$DEBUG" == 1 ]] && echo "Calling acme.sh with tlsport ${acme_tlsport}, full parameters: ${params_base_arr[*]} ${params_issue_arr[*]}"
+        fi
     else 
         echo "Error: unknown ACME challenge method: $acme_challenge"
         return 1
